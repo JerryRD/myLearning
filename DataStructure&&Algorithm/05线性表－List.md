@@ -166,6 +166,7 @@
         a[k]_address = base_address + k * type_size
         //  数组使用连续的空间存储，base_address 为首地址，因此根据公式随机访问效率为 θ(1)
     ```
+
 ### List 的实现 —— 链表
 1. 代码实现
     ```
@@ -229,7 +230,6 @@
         }
     ```
 2. **性能评价**
-
 - **设置栅栏位置** (setPosition) : 平均情况下 `θ(n)`
   
   即**随机访问指定位置的元素，需要从头到开始遍历**，低效
@@ -240,108 +240,58 @@
 
 - **读取栅栏后的元素的值** (getValue) : `θ(1)`
 
-### 特殊的 List —— 栈（Stack）
-1. 栈的特点 : **后进先出** (LIFO)。
+### 链表代码的技巧
 
-2. 相关概念
+1. 理解指针或引用的含义
 
-  **压栈** : 数据进入栈，成为 **栈顶** 元素 ; **弹出** : 栈顶的元素出栈。
+  将某个变量赋值给指针，实际上就是将这个变量的地址赋值给指针。或者反过来说，指针中存储了这个变量的内存地址，指向了这个变量，通过指针就能找到这个变量。
 
-3. **基于数组** 的实现
-    ```
-        class StackBasedArray() {
-            constructor(size) {
-                this.listArray = new Array(size)  // 存放栈的数组
-                this.arraySize = size  // 数组的大小，栈的最大长度
-                this.listSize = 0  // 栈的大小
-            }
+2. 警惕指针丢失和内存泄漏
 
-            this.push = (item) => {  // 压栈
-                if(this.listSize === this.arraySize) {  // 栈已满
-                    retrun false
-                } else {  // 数据入栈
-                    this.list[listSize ++] = item
-                    retrun true
-                }
-            }
+  - 插入结点时，要注意**操作的顺序**
 
-            this.pop = () => {  // 出栈
-                if(this.listSize === 0) {  // 栈为空，下同
-                    return false
-                } else {  // 读取栈顶数据返回，栈的长度 - 1
-                    return this.list[-- this.listSize]
-                }
-            }
+  - 删除链表结点时，要记得**手动释放内存空间**
 
-            this.topValue = () => {  // 读取栈顶元素的值
-                if(this.listSize === 0) {
-                    return false
-                } else {  // 读取栈顶数据返回，栈的长度不变
-                    return this.list[this.listSize - 1]
-                }
-            }
+3. 利用哨兵简化实现难度——**带头链表**
 
-            this.clear = () => {  // 清空栈
-                this.listSize = 0
-            }
-        }
-    ```
+  由于针对链表的插入、删除操作，需要对**插入第一个结点**和**删除最后一个结点**的情况进行特殊处理。
 
-4. 应用案例 —— 利用 **后进先出** 的特点
-- 判断括号是否平衡匹配 : 如 `((())(())))`
+  因此引入哨兵结点，在任何时候，不管链表是否为空，head 指针都会一直指向这个哨兵结点，哨兵结点是不存储数据的。
 
-### 特殊的 List —— 队列（Queue）
-1. 队列的特点 : **先进先出** (FIFO)。
+  从而插入第一个结点和插入其他结点，删除最后一个结点和删除其他结点，都可以统一为相同的代码实现逻辑了。
 
-2. 相关概念
+  我们也把这种有哨兵结点的链表叫带头链表，**上面链表的代码实现已经采用这种方法**。
 
-   **入队** : 从 **队尾** 进入队列 ; **出队** : 从 **队头** 离开队列。
+4. 重点留意边界条件处理
 
-3. **基于链表** 的实现
-```
-    // 一般定义链表的 head 指针指向 队尾，tail 指针指向 队头
-    class Queue() {
-        constructor() {
-            this.head = this.tail = this.position = new Node(void 0, null)
-            this.listSize = 0
-        }
+  我经常用来检查链表代码是否正确的边界条件有这样几个：
 
-        this.enqueue = (item) => {  // 入队
-            this.tail.next = new Node(item, null)
-            this.tail = this.tail.next
-            this.listSize ++
-        }
+  - **链表为空时**
 
-        this.dequeue = () => {  // 出队
-            if(this.listSize === 0) {  // 空队列
-                retrun false
-            } else {
-                let temp = head
-                this.head = this.head.next
-                delete temp
-                this.listSize --
-            }
-        }
+  - **链表只包含一个结点时**
 
-        this.fontValue = () => {  // 读取队头元素的值，不改变队列
-            if(this.listSize === 0) {  // 空队列
-                retrun false
-            } else {
-                return this.tail.value
-            }
-        }
+  - **链表只包含两个结点时**
 
-        this.clear = () => {  // 清空队列
-            while(this.tail !== this.head) {
-                let temp = head
-                this.head = this.head.next
-                delete temp
-            }
-            this.tail.value = void 0
-            this.listSize = 0
-        }
-    }
-```
+  - **处理头结点和尾结点时**
 
-4. 应用案例 —— 利用 **先进先出** 的特点
-- 缓冲区的消息队列
+5. 举例画图，辅助思考
+
+6. 多写多练，没有捷径
+
+7. 常见链表操作的练习
+
+  - [leetcode 206 - 单链表反转](https://leetcode-cn.com/problems/reverse-linked-list/)
+  
+  - [leetcode 21 - 两个有序的链表合并](https://leetcode-cn.com/problems/merge-two-sorted-lists/)
+  
+  - [leetcode 19 - 删除链表倒数第 n 个结点](https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/)
+
+8. **快慢指针的使用** ：**fast = fast.next.next, slow = slow.next**
+
+  - 求链表中点
+    - [leetcode 876 - 求链表的中间结点](https://leetcode-cn.com/problems/middle-of-the-linked-list/)
+
+  - 判断链表中是否有环，以及查找环开始的位置
+    - [leetcode 141 - 链表中环的检测](https://leetcode-cn.com/problems/linked-list-cycle/)
+
+    - [leetcode 141 - 链表中环的检测 II](https://leetcode-cn.com/problems/linked-list-cycle-ii/)
